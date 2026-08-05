@@ -2,14 +2,22 @@
 
 Interactive one-page checklist covering Cursor basics, Cloud Agents, and MCPs.
 
-## Open the guide
+## Open or share the guide
 
-Shareable live page:
+Live page (no clone required):
+
+https://raw.githack.com/mpunzal-cursor/sandbox/cursor/cursor-basics-study-guide-406e/study-guide.html
+
+After merge, the same file on `main` is:
+
+https://raw.githack.com/mpunzal-cursor/sandbox/main/study-guide.html
+
+First-party GitHub Pages URL, once enabled under **Settings → Pages → Source → GitHub Actions**:
 
 - https://mpunzal-cursor.github.io/sandbox/
 - https://mpunzal-cursor.github.io/sandbox/study-guide.html
 
-If GitHub Pages is not live yet, open the file locally:
+To open a local copy:
 
 ```bash
 open study-guide.html
@@ -19,17 +27,7 @@ Or double-click `study-guide.html` / open it from Finder, Explorer, or your brow
 
 Checkboxes persist in this browser via `localStorage` (key `cursor-basics-study-guide-v1`) and survive refresh. Use **Reset progress** on the page to clear them.
 
-## Share the study guide
-
-1. Open the live page or `study-guide.html`.
-2. Click **Copy share link**.
-3. Send that HTTPS URL.
-
-The copied link includes checkbox progress in the `?p=` query string, so a teammate sees the same checks. Section links (`#basics`, `#cloud`, `#mcp`) still work.
-
-If Pages is not enabled, a repo admin should set **Settings → Pages → Source → GitHub Actions**. Until then, send `study-guide.html` as a file, or use this public preview of the current branch:
-
-https://raw.githack.com/mpunzal-cursor/sandbox/cursor/cursor-basics-study-guide-406e/study-guide.html
+**Copy share link** copies an HTTPS URL with checkbox progress in the `?p=` query string, so a teammate sees the same checks. Section links (`#basics`, `#cloud`, `#mcp`) still work.
 
 ## Share this Cloud Agent run
 

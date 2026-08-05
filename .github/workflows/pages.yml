@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - cursor/cursor-basics-study-guide-406e
     paths:
       - "study-guide.html"
       - "index.html"
