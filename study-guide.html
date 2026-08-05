@@ -98,10 +98,19 @@
       cursor: pointer;
     }
 
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
     button:hover { border-color: #b5b5ae; }
     button:focus-visible, a:focus-visible, input:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
+    }
+
+    #share-status {
+      min-height: 1.2em;
+      margin: 0 0 0.85rem;
+      color: var(--done);
+      font-size: 0.9rem;
     }
 
     nav.toc {
@@ -199,10 +208,10 @@
     <header class="page">
       <h1>Cursor basics study guide</h1>
       <p class="lede">For engineers and managers learning current Cursor product surfaces: desktop Agent, Cloud Agents, and MCP. Written against official docs as of August 2026.</p>
-      <p class="how-to">Check an item after you understand it or have tried it. Progress is stored in this browser with <code>localStorage</code> and survives refresh. Use <strong>Reset progress</strong> to clear checkboxes on this device.</p>
+      <p class="how-to">Check an item after you understand it or have tried it. Progress is stored in this browser with <code>localStorage</code> and survives refresh. <strong>Copy share link</strong> copies an HTTPS URL that includes your checks so a teammate opens the same place. <strong>Reset progress</strong> clears checkboxes on this device.</p>
       <div class="callout">
-        <strong>Sharing chats with teammates</strong>
-        <p>Cloud Agent run URLs are how teammates share chats. Local IDE chats are not automatically visible to your team. Send the run URL from <a href="https://cursor.com/agents">cursor.com/agents</a>. See <a href="https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team">Share agents with your team</a>.</p>
+        <strong>Share the guide, not just the chat</strong>
+        <p>Send the study guide URL (use <strong>Copy share link</strong>) so anyone can open the checklist in a browser. That is separate from sharing this Cloud Agent run from <a href="https://cursor.com/agents">cursor.com/agents</a>. Local IDE chats are not automatically visible. See <a href="https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team">Share agents with your team</a>.</p>
       </div>
     </header>
 
@@ -211,8 +220,12 @@
         <span id="done-count">0</span> / <span id="total-count">0</span>
         <span> completed</span>
       </div>
-      <button type="button" id="reset-progress">Reset progress</button>
+      <div class="toolbar-actions">
+        <button type="button" id="share-link">Copy share link</button>
+        <button type="button" id="reset-progress">Reset progress</button>
+      </div>
     </div>
+    <p id="share-status" role="status" aria-live="polite"></p>
 
     <nav class="toc" aria-label="Sections">
       <a href="#basics">1. Cursor basics</a>
@@ -502,42 +515,106 @@
         <li><a href="https://cursor.com/docs/skills">Agent Skills</a></li>
         <li><a href="https://cursor.com/help/ai-features/shared-transcripts">Shared transcripts</a></li>
       </ul>
-      <p class="meta">Self-contained HTML. No server, fonts, or CDN required. Progress key: <code>cursor-basics-study-guide-v1</code>.</p>
+      <p class="meta">Self-contained HTML. Progress key: <code>cursor-basics-study-guide-v1</code>. Share links encode checks in the <code>?p=</code> query so they work across browsers.</p>
     </footer>
   </div>
 
   <script>
     (function () {
       var STORAGE_KEY = "cursor-basics-study-guide-v1";
+      var PUBLIC_URL = "https://mpunzal-cursor.github.io/sandbox/study-guide.html";
       var boxes = Array.prototype.slice.call(
         document.querySelectorAll('input[type="checkbox"][data-id]')
       );
       var doneEl = document.getElementById("done-count");
       var totalEl = document.getElementById("total-count");
       var resetBtn = document.getElementById("reset-progress");
+      var shareBtn = document.getElementById("share-link");
+      var shareStatus = document.getElementById("share-status");
 
       totalEl.textContent = String(boxes.length);
 
-      function loadState() {
-        var saved = {};
-        try {
-          saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
-        } catch (err) {
-          saved = {};
-        }
-        boxes.forEach(function (box) {
-          box.checked = Boolean(saved[box.dataset.id]);
-        });
-        updateCount();
-      }
-
-      function saveState() {
+      function currentState() {
         var state = {};
         boxes.forEach(function (box) {
           state[box.dataset.id] = box.checked;
         });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        return state;
+      }
+
+      function applyState(state) {
+        boxes.forEach(function (box) {
+          box.checked = Boolean(state && state[box.dataset.id]);
+        });
         updateCount();
+      }
+
+      function encodeProgress(state) {
+        var bytes = [];
+        boxes.forEach(function (box, index) {
+          var byteIndex = (index / 8) | 0;
+          if (bytes[byteIndex] == null) bytes[byteIndex] = 0;
+          if (state[box.dataset.id]) bytes[byteIndex] |= 1 << (index % 8);
+        });
+        if (!bytes.length) return "";
+        var hex = bytes.map(function (value) {
+          return (value + 0x100).toString(16).slice(1);
+        }).join("");
+        return "1-" + hex;
+      }
+
+      function decodeProgress(token) {
+        if (!token || token.indexOf("1-") !== 0) return null;
+        var hex = token.slice(2).toLowerCase();
+        if (!hex || hex.length % 2 || /[^0-9a-f]/.test(hex)) return null;
+        var state = {};
+        boxes.forEach(function (box, index) {
+          var byte = parseInt(hex.substr(((index / 8) | 0) * 2, 2) || "00", 16);
+          state[box.dataset.id] = !!(byte & (1 << (index % 8)));
+        });
+        return state;
+      }
+
+      function readLocalState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+        } catch (err) {
+          return {};
+        }
+      }
+
+      function writeLocalState(state) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function shareBase() {
+        if (/^https?:$/.test(location.protocol)) {
+          return location.origin + location.pathname;
+        }
+        return PUBLIC_URL;
+      }
+
+      function buildShareUrl(state) {
+        var url = new URL(shareBase());
+        var token = encodeProgress(state || currentState());
+        var anyChecked = boxes.some(function (box) { return box.checked; });
+        if (token && anyChecked) url.searchParams.set("p", token);
+        else url.searchParams.delete("p");
+        return url.toString();
+      }
+
+      function persistUrl(state) {
+        if (!/^https?:$/.test(location.protocol) || !window.history || !history.replaceState) return;
+        try {
+          var next = new URL(location.href);
+          var token = encodeProgress(state);
+          var anyChecked = boxes.some(function (box) { return box.checked; });
+          if (token && anyChecked) next.searchParams.set("p", token);
+          else next.searchParams.delete("p");
+          history.replaceState(null, "", next.pathname + next.search + next.hash);
+        } catch (err) {
+          /* ignore restricted file/history contexts */
+        }
       }
 
       function updateCount() {
@@ -548,18 +625,74 @@
         doneEl.textContent = String(done);
       }
 
+      function saveState() {
+        var state = currentState();
+        writeLocalState(state);
+        persistUrl(state);
+        updateCount();
+      }
+
+      function loadState() {
+        var params = new URLSearchParams(location.search);
+        var shared = decodeProgress(params.get("p") || "");
+        var state = shared || readLocalState();
+        applyState(state);
+        writeLocalState(currentState());
+        persistUrl(currentState());
+      }
+
+      function setShareStatus(message) {
+        shareStatus.textContent = message || "";
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function (resolve, reject) {
+          var field = document.createElement("textarea");
+          field.value = text;
+          field.setAttribute("readonly", "");
+          field.style.position = "fixed";
+          field.style.left = "-9999px";
+          document.body.appendChild(field);
+          field.select();
+          try {
+            if (!document.execCommand("copy")) throw new Error("copy failed");
+            resolve();
+          } catch (err) {
+            reject(err);
+          } finally {
+            document.body.removeChild(field);
+          }
+        });
+      }
+
       boxes.forEach(function (box) {
         box.addEventListener("change", saveState);
+      });
+
+      shareBtn.addEventListener("click", function () {
+        var url = buildShareUrl();
+        shareBtn.setAttribute("data-last-share-url", url);
+        copyText(url).then(function () {
+          setShareStatus("Share link copied. Recipients can open it without cloning the repo.");
+          shareBtn.textContent = "Copied";
+          window.setTimeout(function () {
+            shareBtn.textContent = "Copy share link";
+          }, 1600);
+        }).catch(function () {
+          setShareStatus("Copy failed. Select and copy this link: " + url);
+        });
       });
 
       resetBtn.addEventListener("click", function () {
         var confirmed = window.confirm("Clear all study-guide progress in this browser?");
         if (!confirmed) return;
         localStorage.removeItem(STORAGE_KEY);
-        boxes.forEach(function (box) {
-          box.checked = false;
-        });
-        updateCount();
+        applyState({});
+        persistUrl({});
+        setShareStatus("");
       });
 
       loadState();
