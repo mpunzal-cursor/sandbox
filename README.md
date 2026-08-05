@@ -8,19 +8,19 @@ Interactive one-page checklist covering Cursor basics, Cloud Agents, and MCPs.
 open study-guide.html
 ```
 
-Or double-click `study-guide.html` in Finder. No server is required.
+Or double-click `study-guide.html` / open it from Finder, Explorer, or your browser’s File menu. No server is required.
 
-Checkboxes save in this browser via `localStorage`. Use **Reset progress** to clear them.
+Checkboxes persist in this browser via `localStorage` (key `cursor-basics-study-guide-v1`) and survive refresh. Use **Reset progress** on the page to clear them.
 
-## Share with a teammate
+## Share this Cloud Agent run
 
-This repo is meant to be driven by a **Cloud Agent** so the chat itself can be shared.
+This repo is meant to be driven by a **Cloud Agent** so the chat itself can be shared with a manager or teammate.
 
-1. Open the Cloud Agent run on [cursor.com/agents](https://cursor.com/agents).
-2. Copy the run URL and send it.
+1. Open the run on [cursor.com/agents](https://cursor.com/agents).
+2. Copy the Cloud Agent run URL and send it.
 3. The viewer must be on the same Cursor team, have source control connected under [Integrations](https://cursor.com/dashboard/integrations), and have access to this GitHub repository.
 
-Team membership alone is not enough. See [Share agents with your team](https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team).
+Team membership alone is not enough. Local IDE chats are not automatically visible. See [Share agents with your team](https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team).
 
 ## Conventions
 
