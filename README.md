@@ -1,6 +1,6 @@
-# Cursor basics study guide
+# Cursor basics learning guide
 
-Interactive one-page checklist covering Cursor basics, Cloud Agents, and MCPs.
+Interactive one-page learning guide covering Cursor basics, Cloud Agents, and MCPs. Lessons stay on the page; official Cursor videos load inside topic dropdowns.
 
 ## Open or share the guide
 
@@ -23,11 +23,17 @@ To open a local copy:
 open study-guide.html
 ```
 
-Or double-click `study-guide.html` / open it from Finder, Explorer, or your browser’s File menu. No server is required.
+Or double-click `study-guide.html`. No server is required for the lessons. Opening a topic loads official videos from YouTube when you are online.
 
-Checkboxes persist in this browser via `localStorage` (key `cursor-basics-study-guide-v1`) and survive refresh. Use **Reset progress** on the page to clear them.
+## Progress markers
 
-**Copy share link** copies an HTTPS URL with checkbox progress in the `?p=` query string, so a teammate sees the same checks. Section links (`#basics`, `#cloud`, `#mcp`) still work.
+Click the square next to a topic:
+
+1. Green check = learned
+2. Red X = skipped / not needed
+3. Third click = clear
+
+Progress is stored in this browser via `localStorage` (`cursor-basics-study-guide-v2`) and survives refresh. **Copy share link** includes checks and skips in `?p=`. **Reset progress** clears local state.
 
 ## Share this Cloud Agent run
 
