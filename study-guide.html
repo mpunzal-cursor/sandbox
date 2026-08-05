@@ -272,10 +272,10 @@
     <header class="page">
       <h1>Cursor basics learning guide</h1>
       <p class="lede">Learn current Cursor surfaces in place: desktop Agent, Cloud Agents, and MCP. Written against official docs and Cursor’s own videos as of August 2026.</p>
-      <p class="how-to">Open a topic to learn it here. Marker clicks cycle <strong>blank → green check → red X → blank</strong>. Green means learned. Red X means skipped or not needed. Progress is saved in this browser and can be shared with <strong>Copy share link</strong>.</p>
+      <p class="how-to">Open a topic to learn it here. Marker clicks cycle <strong>blank → green check → red X → blank</strong>. Green means learned. Red X means skipped or not needed. The shareable copy for teammates lives in Notion. This local file keeps the interactive markers.</p>
       <div class="callout">
-        <strong>Share the guide, not just the chat</strong>
-        <p>Live page: <a href="https://raw.githack.com/mpunzal-cursor/sandbox/cursor/cursor-basics-study-guide-406e/study-guide.html">open this guide in a browser</a>. Copy share link includes your checks and skips. Cloud Agent chats are shared separately from <a href="https://cursor.com/agents">cursor.com/agents</a>. See <a href="https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team">Share agents with your team</a>.</p>
+        <strong>Share links</strong>
+        <p><strong>Learning guide (Notion):</strong> publish/share <code>study-guide.notion.md</code> from Notion — not githack. After the Notion page exists, paste its URL into <code>NOTION_URL</code> below or the README.<br><strong>This agent chat:</strong> <a href="https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e">https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e</a>. Viewers need the same Cursor team, their own GitHub connected at <a href="https://cursor.com/dashboard/integrations">Integrations</a>, and access to this repo. See <a href="https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team">Share agents with your team</a>.</p>
       </div>
     </header>
 
@@ -286,7 +286,7 @@
         <span id="skip-label"></span>
       </div>
       <div class="toolbar-actions">
-        <button type="button" id="share-link">Copy share link</button>
+        <button type="button" id="share-link">Copy share info</button>
         <button type="button" id="reset-progress">Reset progress</button>
       </div>
     </div>
@@ -750,7 +750,8 @@ Validate first with python scripts/validate.py</pre>
   <script>
     (function () {
       var STORAGE_KEY = "cursor-basics-study-guide-v2";
-      var PUBLIC_URL = "https://raw.githack.com/mpunzal-cursor/sandbox/cursor/cursor-basics-study-guide-406e/study-guide.html";
+      var NOTION_URL = "";
+      var AGENT_CHAT_URL = "https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e";
       var markers = Array.prototype.slice.call(document.querySelectorAll(".marker[data-id]"));
       var doneEl = document.getElementById("done-count");
       var totalEl = document.getElementById("total-count");
@@ -848,17 +849,17 @@ Validate first with python scripts/validate.py</pre>
         localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
       }
 
-      function shareBase() {
-        if (/^https?:$/.test(location.protocol)) return location.origin + location.pathname;
-        return PUBLIC_URL;
-      }
-
-      function buildShareUrl(codes) {
-        var url = new URL(shareBase());
+      function buildShareText(codes) {
+        var lines = [];
+        if (NOTION_URL) {
+          lines.push("Learning guide (Notion): " + NOTION_URL);
+        } else {
+          lines.push("Learning guide (Notion): import study-guide.notion.md into Notion and share that page. Do not use githack.");
+        }
+        lines.push("Agent chat: " + AGENT_CHAT_URL);
         var any = codes.some(function (code) { return code > 0; });
-        if (any) url.searchParams.set("p", encodeProgress(codes));
-        else url.searchParams.delete("p");
-        return url.toString();
+        if (any) lines.push("Local HTML progress token: " + encodeProgress(codes));
+        return lines.join("\n");
       }
 
       function persistUrl(codes) {
@@ -943,14 +944,14 @@ Validate first with python scripts/validate.py</pre>
       });
 
       shareBtn.addEventListener("click", function () {
-        var url = buildShareUrl(currentCodes());
-        shareBtn.setAttribute("data-last-share-url", url);
-        copyText(url).then(function () {
-          shareStatus.textContent = "Share link copied, including learned and skipped items.";
+        var text = buildShareText(currentCodes());
+        shareBtn.setAttribute("data-last-share-url", text);
+        copyText(text).then(function () {
+          shareStatus.textContent = "Copied Notion + agent chat share info.";
           shareBtn.textContent = "Copied";
-          window.setTimeout(function () { shareBtn.textContent = "Copy share link"; }, 1600);
+          window.setTimeout(function () { shareBtn.textContent = "Copy share info"; }, 1600);
         }).catch(function () {
-          shareStatus.textContent = "Copy failed. Select and copy this link: " + url;
+          shareStatus.textContent = "Copy failed. Share info:\n" + text;
         });
       });
 

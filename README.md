@@ -1,49 +1,37 @@
 # Cursor basics learning guide
 
-Interactive one-page learning guide covering Cursor basics, Cloud Agents, and MCPs. Lessons stay on the page; official Cursor videos load inside topic dropdowns.
+Interactive local HTML lessons plus a Notion-ready copy for sharing. Covers Cursor basics, Cloud Agents, and MCPs.
 
-## Open or share the guide
+## Share in Notion (preferred)
 
-Live page (no clone required):
+Do **not** use githack or other third-party HTML hosts.
 
-https://raw.githack.com/mpunzal-cursor/sandbox/cursor/cursor-basics-study-guide-406e/study-guide.html
+1. Import [`study-guide.notion.md`](study-guide.notion.md) into Notion (**Import → Markdown**).
+2. Convert topic headings to toggles if your importer does not.
+3. Share the Notion page with your manager (workspace share or a specific person).
+4. Paste the published Notion URL into `NOTION_URL` in `study-guide.html` when you want **Copy share info** to include it.
 
-After merge, the same file on `main` is:
-
-https://raw.githack.com/mpunzal-cursor/sandbox/main/study-guide.html
-
-First-party GitHub Pages URL, once enabled under **Settings → Pages → Source → GitHub Actions**:
-
-- https://mpunzal-cursor.github.io/sandbox/
-- https://mpunzal-cursor.github.io/sandbox/study-guide.html
-
-To open a local copy:
+## Open locally (interactive markers)
 
 ```bash
 open study-guide.html
 ```
 
-Or double-click `study-guide.html`. No server is required for the lessons. Opening a topic loads official videos from YouTube when you are online.
-
-## Progress markers
-
-Click the square next to a topic:
-
-1. Green check = learned
-2. Red X = skipped / not needed
-3. Third click = clear
-
-Progress is stored in this browser via `localStorage` (`cursor-basics-study-guide-v2`) and survives refresh. **Copy share link** includes checks and skips in `?p=`. **Reset progress** clears local state.
+Marker clicks: blank → green check → red X → blank. Progress is stored in this browser (`cursor-basics-study-guide-v2`). Videos load from YouTube only after you open a topic.
 
 ## Share this Cloud Agent run
 
-The guide URL and the Cloud Agent chat are different things.
+Chat URL:
 
-1. Open the run on [cursor.com/agents](https://cursor.com/agents).
-2. Copy the Cloud Agent run URL and send it.
-3. The viewer must be on the same Cursor team, have source control connected under [Integrations](https://cursor.com/dashboard/integrations), and have access to this GitHub repository.
+https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e
 
-Team membership alone is not enough. Local IDE chats are not automatically visible. See [Share agents with your team](https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team).
+This run is **team-visible**. A viewer still needs:
+
+1. The same Cursor team as the run owner (Mark Punzal).
+2. Their own GitHub connected at [Integrations](https://cursor.com/dashboard/integrations).
+3. Access to [github.com/mpunzal-cursor/sandbox](https://github.com/mpunzal-cursor/sandbox) (this repo is **public**, so GitHub read access is open).
+
+Team membership alone is not enough. Default view is read-only. See [Share agents with your team](https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team).
 
 ## Conventions
 
