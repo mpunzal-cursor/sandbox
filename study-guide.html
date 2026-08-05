@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cursor basics study guide</title>
+  <style>
+    :root {
+      --bg: #f6f6f4;
+      --surface: #ffffff;
+      --text: #1b1b1b;
+      --muted: #5b5b5b;
+      --line: #d9d9d4;
+      --accent: #163a4a;
+      --accent-soft: #e8eef1;
+      --callout: #f3efe6;
+      --callout-border: #d4cbb6;
+      --done: #2f5d3a;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2.5rem;
+    }
+
+    header.page {
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.45rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+
+    .lede, .how-to, p, li {
+      color: var(--text);
+    }
+
+    .lede, .how-to {
+      margin: 0 0 0.6rem;
+      color: var(--muted);
+    }
+
+    .callout {
+      background: var(--callout);
+      border: 1px solid var(--callout-border);
+      border-radius: 6px;
+      padding: 0.7rem 0.85rem;
+      margin: 0.75rem 0 1rem;
+    }
+
+    .callout strong { display: block; margin-bottom: 0.2rem; }
+    .callout p { margin: 0; color: var(--text); }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.55rem 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .progress {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .progress span { color: var(--muted); font-weight: 500; }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--text);
+      border-radius: 5px;
+      padding: 0.35rem 0.65rem;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: #b5b5ae; }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.85rem;
+      margin: 0 0 1rem;
+      font-size: 0.92rem;
+    }
+
+    nav.toc a { color: var(--accent); }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.85rem 0.95rem 0.55rem;
+      margin-bottom: 0.85rem;
+    }
+
+    h2 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      font-weight: 650;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1.15rem 1fr;
+      gap: 0.55rem 0.65rem;
+      padding: 0.55rem 0;
+      border-top: 1px solid var(--line);
+      cursor: pointer;
+    }
+
+    .item input {
+      margin: 0.2rem 0 0;
+      width: 0.95rem;
+      height: 0.95rem;
+      accent-color: var(--accent);
+    }
+
+    .item-title {
+      display: block;
+      font-weight: 600;
+    }
+
+    .item-desc {
+      display: block;
+      margin-top: 0.15rem;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    .item:has(input:checked) .item-title {
+      color: var(--done);
+    }
+
+    kbd, code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.86em;
+    }
+
+    kbd {
+      border: 1px solid var(--line);
+      background: var(--bg);
+      border-radius: 3px;
+      padding: 0 0.28rem;
+    }
+
+    footer.sources {
+      margin-top: 0.4rem;
+      padding-top: 0.2rem;
+    }
+
+    footer.sources h2 { margin-bottom: 0.4rem; }
+
+    footer.sources ul {
+      margin: 0;
+      padding-left: 1.15rem;
+    }
+
+    footer.sources li { margin: 0.25rem 0; }
+    a { color: var(--accent); }
+
+    .meta {
+      margin-top: 0.85rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page">
+      <h1>Cursor basics study guide</h1>
+      <p class="lede">For engineers and managers learning current Cursor product surfaces: desktop Agent, Cloud Agents, and MCP. Written against official docs as of August 2026.</p>
+      <p class="how-to">Check an item after you understand it or have tried it. Progress is stored in this browser with <code>localStorage</code> and survives refresh. Use <strong>Reset progress</strong> to clear checkboxes on this device.</p>
+      <div class="callout">
+        <strong>Sharing chats with teammates</strong>
+        <p>Cloud Agent run URLs are how teammates share chats. Local IDE chats are not automatically visible to your team. Send the run URL from <a href="https://cursor.com/agents">cursor.com/agents</a>. See <a href="https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team">Share agents with your team</a>.</p>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="progress" aria-live="polite">
+        <span id="done-count">0</span> / <span id="total-count">0</span>
+        <span> completed</span>
+      </div>
+      <button type="button" id="reset-progress">Reset progress</button>
+    </div>
+
+    <nav class="toc" aria-label="Sections">
+      <a href="#basics">1. Cursor basics</a>
+      <a href="#cloud">2. Cloud Agents</a>
+      <a href="#mcp">3. MCP</a>
+      <a href="#sources">Official docs</a>
+    </nav>
+
+    <main>
+      <section id="basics">
+        <h2>1. Cursor basics</h2>
+
+        <label class="item">
+          <input type="checkbox" data-id="what-cursor-is">
+          <span class="item-body">
+            <span class="item-title">What Cursor is</span>
+            <span class="item-desc">Cursor is a desktop AI code editor whose main product surface is Agent. The same agent loop also runs as Cloud Agents on the web and mobile, so work can continue without your laptop.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="open-folder">
+          <span class="item-body">
+            <span class="item-title">Open a project folder</span>
+            <span class="item-desc">Open the repo folder in Cursor first. Agent, rules, skills, and project MCP config are scoped to that workspace.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="open-agent">
+          <span class="item-body">
+            <span class="item-title">Open Agent with <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>I</kbd></span>
+            <span class="item-desc">Press <kbd>Cmd</kbd>+<kbd>I</kbd> on Mac or <kbd>Ctrl</kbd>+<kbd>I</kbd> on Windows/Linux to open the Agent panel. Type a specific task and press Return.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mode-agent">
+          <span class="item-body">
+            <span class="item-title">Agent mode edits and runs commands</span>
+            <span class="item-desc">Agent searches the codebase, edits files, runs terminal commands, and iterates. Use it for building, refactoring, fixing bugs, and verifying results.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mode-ask">
+          <span class="item-body">
+            <span class="item-title">Ask mode is read-only</span>
+            <span class="item-desc">Ask explains code and architecture without editing files. Switch here when you want answers, not changes.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mode-plan">
+          <span class="item-body">
+            <span class="item-title">Plan mode researches, then Build</span>
+            <span class="item-desc">Plan explores the repo, asks clarifying questions, and writes a reviewable plan. Click <strong>Build</strong> only after you approve the approach.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mode-debug">
+          <span class="item-body">
+            <span class="item-title">Debug mode for runtime evidence</span>
+            <span class="item-desc">Debug is for tricky bugs that need runtime evidence. It can edit files while gathering that evidence.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mode-cycle">
+          <span class="item-body">
+            <span class="item-title">Cycle modes with <kbd>Shift</kbd>+<kbd>Tab</kbd></span>
+            <span class="item-desc">Use <kbd>Shift</kbd>+<kbd>Tab</kbd> or the mode picker. Each mode starts a fresh context window, so start a new chat when the task changes.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="tab-autocomplete">
+          <span class="item-body">
+            <span class="item-title">Tab autocomplete</span>
+            <span class="item-desc">Tab suggests edits as you type, including multi-line and cross-file jumps. Accept with <kbd>Tab</kbd>, reject with <kbd>Esc</kbd>. It is not the Agent panel.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="inline-edit">
+          <span class="item-body">
+            <span class="item-title">Inline edit with <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>K</kbd></span>
+            <span class="item-desc">Select code, press <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>K</kbd>, describe the change, and apply it in place. Use this for targeted single-area edits without opening Agent. User rules do not apply here.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="at-mentions">
+          <span class="item-body">
+            <span class="item-title">@ mentions attach context</span>
+            <span class="item-desc">Type <code>@</code> to attach files, folders, docs you reference as files, terminals, git diffs, or browser context. Skip <code>@</code> when you are unsure; Agent can search on its own.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="rules-project">
+          <span class="item-body">
+            <span class="item-title">Project rules in <code>.cursor/rules</code></span>
+            <span class="item-desc">Version-controlled <code>.mdc</code> files guide Agent in this repo. They can always apply, apply by glob, apply when relevant, or apply only when <code>@</code>-mentioned.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="rules-user">
+          <span class="item-body">
+            <span class="item-title">User rules</span>
+            <span class="item-desc">Global preferences in <strong>Customize → Rules</strong>. They apply across projects in Agent chat, not to Tab or inline edit.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="rules-team">
+          <span class="item-body">
+            <span class="item-title">Team rules</span>
+            <span class="item-desc">Teams and Enterprise can manage rules from the dashboard. Precedence is Team → Project → User. Admins can enforce rules so members cannot turn them off.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="agents-md">
+          <span class="item-body">
+            <span class="item-title"><code>AGENTS.md</code></span>
+            <span class="item-desc">Plain markdown agent instructions in the project root or nested folders. Nested files combine; more specific directories take precedence. Use this when you do not need <code>.mdc</code> frontmatter.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="skills">
+          <span class="item-body">
+            <span class="item-title">Skills (<code>SKILL.md</code>)</span>
+            <span class="item-desc">Portable workflow packages discovered from <code>.cursor/skills/</code>, <code>.agents/skills/</code>, and matching user-level folders. Agent applies relevant skills, or invoke one with <code>/</code> in chat.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="models-composer">
+          <span class="item-body">
+            <span class="item-title">Models picker: Composer 2.5 is a model</span>
+            <span class="item-desc">Choose a model in the picker (or cycle with <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>/</kbd>). Composer 2.5 is a Cursor model, not the old Composer UI. Agent is the product surface; mode and model are independent choices.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="privacy-mode">
+          <span class="item-body">
+            <span class="item-title">Privacy Mode for teams</span>
+            <span class="item-desc">Privacy Mode is on by default for teams and means Cursor does not train on your code. Legacy <strong>No Storage</strong> Privacy Mode blocks Cloud Agents and Shared Transcripts because those features need cloud storage.</span>
+          </span>
+        </label>
+      </section>
+
+      <section id="cloud">
+        <h2>2. Cloud Agents</h2>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-isolated-vm">
+          <span class="item-body">
+            <span class="item-title">Isolated cloud VM, not your laptop</span>
+            <span class="item-desc">Cloud Agents were formerly called Background Agents. They run in isolated cloud VMs with a full dev environment (clone, deps, secrets, network), not on your local machine.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-vs-local">
+          <span class="item-body">
+            <span class="item-title">Local vs Cloud</span>
+            <span class="item-desc">Local Agent edits on your laptop. Cloud runs on a VM, does not need your laptop to stay online, can run many agents in parallel, pushes branches/PRs for handoff, and shares via run URLs. Review happens on the run page rather than only in your local diff view.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-start-web-desktop">
+          <span class="item-body">
+            <span class="item-title">Start from web or desktop</span>
+            <span class="item-desc">Use <a href="https://cursor.com/agents">cursor.com/agents</a>, or in desktop Agent choose <strong>Cloud</strong> in the dropdown under the input. On iOS use the Cursor app; on Android use the agents site as a PWA.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-start-integrations">
+          <span class="item-body">
+            <span class="item-title">Start from Slack, GitHub, or Linear</span>
+            <span class="item-desc">Kick off a run with <code>@cursor</code> in Slack or Linear, or comment <code>@cursor</code> on a GitHub PR/issue (Bitbucket PRs are also supported). A team admin must connect source control before anyone can start agents on a repo.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-review">
+          <span class="item-body">
+            <span class="item-title">Review conversation, diffs, artifacts, and PRs</span>
+            <span class="item-desc">Open the run to read the chat, inspect diffs, view artifacts (screenshots, videos, logs), optionally control the remote desktop, and use the PR the agent opened when it pushed.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-share">
+          <span class="item-body">
+            <span class="item-title">Share the run URL</span>
+            <span class="item-desc">Send the agent URL. The viewer needs (1) the same Cursor team, (2) their own SCM connected at <a href="https://cursor.com/dashboard/integrations">cursor.com/dashboard/integrations</a>, and (3) access to the repo. Team membership alone is not enough.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="cloud-followups">
+          <span class="item-body">
+            <span class="item-title">Default view is read-only</span>
+            <span class="item-desc">Teammates can view conversation, diffs, and artifacts. They can send follow-ups only if a team admin has enabled team follow-ups.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="shared-transcripts">
+          <span class="item-body">
+            <span class="item-title">Do not confuse with Shared Transcripts</span>
+            <span class="item-desc">Shared Transcripts are local chat share links at <code>cursor.com/s/…</code> (Teams and Enterprise only). They are a different feature from Cloud Agent run URLs and are unavailable under No Storage Privacy Mode.</span>
+          </span>
+        </label>
+      </section>
+
+      <section id="mcp">
+        <h2>3. MCP (Model Context Protocol)</h2>
+
+        <label class="item">
+          <input type="checkbox" data-id="mcp-what">
+          <span class="item-body">
+            <span class="item-title">What MCP is</span>
+            <span class="item-desc">MCP connects Agent to external tools and data — Linear, Notion, databases, APIs, and similar systems — so the agent can act in those tools instead of relying on pasted context.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mcp-local-ui">
+          <span class="item-body">
+            <span class="item-title">Add MCP locally from Customize</span>
+            <span class="item-desc">Open <strong>Customize</strong> in the sidebar and manage MCPs, including one-click marketplace installs. Toggle servers on or off there without deleting them.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mcp-json-locations">
+          <span class="item-body">
+            <span class="item-title">Project vs user <code>mcp.json</code></span>
+            <span class="item-desc">Put project tools in <code>.cursor/mcp.json</code>. Put personal tools in <code>~/.cursor/mcp.json</code>. Project files are shared via git with anyone who clones the repo.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mcp-team-vs-git">
+          <span class="item-body">
+            <span class="item-title">Team MCP, git config, and marketplace are separate</span>
+            <span class="item-desc">Dashboard <strong>Integrations &amp; MCP</strong> feeds Cloud Agents. A git-tracked <code>mcp.json</code> feeds local clones. Marketplace install is a separate action and does not automatically enable the server for every teammate or every Cloud run.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mcp-cloud-transports">
+          <span class="item-body">
+            <span class="item-title">Cloud MCP: HTTP preferred; SSE / mcp-remote unsupported</span>
+            <span class="item-desc">Cloud Agents support HTTP (recommended) and stdio. SSE and <code>mcp-remote</code> are not supported on Cloud. OAuth is per-user, including for team-shared servers.</span>
+          </span>
+        </label>
+
+        <label class="item">
+          <input type="checkbox" data-id="mcp-security">
+          <span class="item-body">
+            <span class="item-title">MCP security basics</span>
+            <span class="item-desc">Install only trusted publishers, grant least privilege, and do not hardcode secrets in git-tracked <code>mcp.json</code>. Prefer <code>${env:NAME}</code> interpolation, dashboard secrets, or OAuth.</span>
+          </span>
+        </label>
+      </section>
+    </main>
+
+    <footer class="sources" id="sources">
+      <h2>Official docs</h2>
+      <ul>
+        <li><a href="https://cursor.com/docs/agent/overview">Agent overview</a></li>
+        <li><a href="https://cursor.com/help/ai-features/agent">Agent mode help</a></li>
+        <li><a href="https://cursor.com/docs/cloud-agent">Cloud Agents</a></li>
+        <li><a href="https://cursor.com/docs/mcp">Model Context Protocol (MCP)</a></li>
+        <li><a href="https://cursor.com/docs/rules">Rules</a></li>
+        <li><a href="https://cursor.com/docs/skills">Agent Skills</a></li>
+        <li><a href="https://cursor.com/help/ai-features/shared-transcripts">Shared transcripts</a></li>
+      </ul>
+      <p class="meta">Self-contained HTML. No server, fonts, or CDN required. Progress key: <code>cursor-basics-study-guide-v1</code>.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var STORAGE_KEY = "cursor-basics-study-guide-v1";
+      var boxes = Array.prototype.slice.call(
+        document.querySelectorAll('input[type="checkbox"][data-id]')
+      );
+      var doneEl = document.getElementById("done-count");
+      var totalEl = document.getElementById("total-count");
+      var resetBtn = document.getElementById("reset-progress");
+
+      totalEl.textContent = String(boxes.length);
+
+      function loadState() {
+        var saved = {};
+        try {
+          saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+        } catch (err) {
+          saved = {};
+        }
+        boxes.forEach(function (box) {
+          box.checked = Boolean(saved[box.dataset.id]);
+        });
+        updateCount();
+      }
+
+      function saveState() {
+        var state = {};
+        boxes.forEach(function (box) {
+          state[box.dataset.id] = box.checked;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        updateCount();
+      }
+
+      function updateCount() {
+        var done = 0;
+        boxes.forEach(function (box) {
+          if (box.checked) done += 1;
+        });
+        doneEl.textContent = String(done);
+      }
+
+      boxes.forEach(function (box) {
+        box.addEventListener("change", saveState);
+      });
+
+      resetBtn.addEventListener("click", function () {
+        var confirmed = window.confirm("Clear all study-guide progress in this browser?");
+        if (!confirmed) return;
+        localStorage.removeItem(STORAGE_KEY);
+        boxes.forEach(function (box) {
+          box.checked = false;
+        });
+        updateCount();
+      });
+
+      loadState();
+    })();
+  </script>
+</body>
+</html>
