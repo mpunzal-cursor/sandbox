@@ -4,6 +4,13 @@ Interactive one-page checklist covering Cursor basics, Cloud Agents, and MCPs.
 
 ## Open the guide
 
+Shareable live page:
+
+- https://mpunzal-cursor.github.io/sandbox/
+- https://mpunzal-cursor.github.io/sandbox/study-guide.html
+
+If GitHub Pages is not live yet, open the file locally:
+
 ```bash
 open study-guide.html
 ```
@@ -12,9 +19,21 @@ Or double-click `study-guide.html` / open it from Finder, Explorer, or your brow
 
 Checkboxes persist in this browser via `localStorage` (key `cursor-basics-study-guide-v1`) and survive refresh. Use **Reset progress** on the page to clear them.
 
+## Share the study guide
+
+1. Open the live page or `study-guide.html`.
+2. Click **Copy share link**.
+3. Send that HTTPS URL.
+
+The copied link includes checkbox progress in the `?p=` query string, so a teammate sees the same checks. Section links (`#basics`, `#cloud`, `#mcp`) still work.
+
+If Pages is not enabled, a repo admin should set **Settings → Pages → Source → GitHub Actions**. Until then, send `study-guide.html` as a file, or use this public preview of the current branch:
+
+https://raw.githack.com/mpunzal-cursor/sandbox/cursor/cursor-basics-study-guide-406e/study-guide.html
+
 ## Share this Cloud Agent run
 
-This repo is meant to be driven by a **Cloud Agent** so the chat itself can be shared with a manager or teammate.
+The guide URL and the Cloud Agent chat are different things.
 
 1. Open the run on [cursor.com/agents](https://cursor.com/agents).
 2. Copy the Cloud Agent run URL and send it.
