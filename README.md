@@ -6,10 +6,18 @@ Interactive local HTML lessons plus a Notion-ready copy for sharing. Covers Curs
 
 Do **not** use githack or other third-party HTML hosts.
 
+Installing the Notion MCP for the team is not enough for this Cloud Agent. OAuth is **per-user** and must be completed for the run:
+
+1. Open https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e
+2. Use the **MCP** dropdown on that run and sign in to Notion (Approve access to the pages/workspace where the guide should live).
+3. Send a follow-up in this chat so the agent can create the live Notion page.
+
+Manual fallback if you do not want to wait on MCP:
+
 1. Import [`study-guide.notion.md`](study-guide.notion.md) into Notion (**Import → Markdown**).
-2. Convert topic headings to toggles if your importer does not.
-3. Share the Notion page with your manager (workspace share or a specific person).
-4. Paste the published Notion URL into `NOTION_URL` in `study-guide.html` when you want **Copy share info** to include it.
+2. Convert topic headings to toggles if needed.
+3. Share the Notion page with your manager.
+4. Paste the Notion URL into `NOTION_URL` in `study-guide.html`.
 
 ## Open locally (interactive markers)
 
