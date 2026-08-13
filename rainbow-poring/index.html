@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Rainbow Poring — appearance draft</title>
+  <title>Rainbow Poring</title>
   <style>
     :root {
       --bg: #1a1520;
@@ -41,7 +41,7 @@
     .lede {
       margin: 0 0 28px;
       color: var(--muted);
-      max-width: 52ch;
+      max-width: 58ch;
       line-height: 1.45;
     }
 
@@ -69,8 +69,7 @@
       overflow: hidden;
     }
 
-    .stage::after {
-      content: "desktop corner preview · 160px";
+    .stage-label {
       position: absolute;
       right: 16px;
       bottom: 12px;
@@ -85,6 +84,8 @@
       position: relative;
     }
 
+    .pet-wrap.joinable { cursor: pointer; }
+
     .speech {
       position: absolute;
       left: 118px;
@@ -96,6 +97,9 @@
       padding: 6px 10px;
       border-radius: 12px 12px 12px 4px;
       white-space: nowrap;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       opacity: 0;
       transform: translateY(6px) scale(0.9);
       pointer-events: none;
@@ -122,14 +126,15 @@
 
     .antenna-orb { fill: url(#rainbow); }
 
-    .states {
+    .row {
       display: flex;
       gap: 8px;
-      margin: 16px 0 28px;
+      margin: 16px 0 0;
       flex-wrap: wrap;
+      align-items: center;
     }
 
-    button {
+    button, .ghost {
       appearance: none;
       border: 1px solid var(--line);
       background: var(--panel);
@@ -147,19 +152,81 @@
       border-color: #fff;
     }
 
-    dl {
-      display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: 10px 16px;
-      margin: 0;
+    button.primary {
+      background: #fff;
+      color: #1a1520;
+      border-color: #fff;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin: 16px 0 0;
+      padding: 14px 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
       font-size: 14px;
       line-height: 1.45;
     }
 
-    dt { color: var(--muted); font-weight: 600; }
-    dd { margin: 0; }
+    .status strong { font-weight: 650; }
+    .status .muted { color: var(--muted); }
 
-    /* animations */
+    .warn {
+      color: #ffb4a2;
+    }
+
+    details.setup {
+      margin-top: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 16px 16px;
+    }
+
+    details.setup summary {
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    details.setup ol {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      padding-left: 20px;
+    }
+
+    details.setup code, .origin {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      background: #1a1520;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    label.field {
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #1a1520;
+      color: var(--ink);
+      font: inherit;
+      font-size: 14px;
+    }
+
     .pet-wrap.idle { animation: idle-bounce 1.8s ease-in-out infinite; }
     .pet-wrap.nap { animation: nap-breathe 2.8s ease-in-out infinite; }
     .pet-wrap.antsy { animation: antsy-bounce 0.28s ease-in-out infinite; }
@@ -175,19 +242,14 @@
       animation: bubble-pop 0.9s ease-in-out infinite;
     }
 
-    .rainbow-shift {
-      animation: hue 6s linear infinite;
-    }
-
+    .rainbow-shift { animation: hue 6s linear infinite; }
     .pet-wrap.nap .rainbow-shift { animation-duration: 16s; }
     .pet-wrap.antsy .rainbow-shift { animation-duration: 1.4s; }
 
     .blink { animation: blink 4.5s infinite; }
     .pet-wrap.nap .blink { animation: none; }
 
-    @keyframes hue {
-      to { filter: hue-rotate(360deg); }
-    }
+    @keyframes hue { to { filter: hue-rotate(360deg); } }
 
     @keyframes idle-bounce {
       0%, 100% { transform: translateY(0) scale(1, 1); }
@@ -225,15 +287,15 @@
   <main>
     <h1>Rainbow Poring</h1>
     <p class="lede">
-      Ragnarok jelly, desktop-pet size. Same silhouette as a classic Poring —
-      blob, antenna orb, oval eyes — with a body that keeps changing color.
+      Reads your Google Calendar, naps while you work, then freaks out five
+      minutes before a meeting. Click the Poring to open the call.
     </p>
 
     <div class="stage">
-      <div class="pet-wrap idle" id="pet">
+      <div class="pet-wrap nap" id="pet" role="button" tabindex="0" aria-label="Rainbow Poring">
         <div class="speech" id="speech">meetiiing!!</div>
         <div class="zzz">Zzz</div>
-        <svg viewBox="0 0 160 160" aria-label="Rainbow Poring">
+        <svg viewBox="0 0 160 160" aria-hidden="true">
           <defs>
             <linearGradient id="rainbow" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stop-color="#ff5ad9"/>
@@ -254,21 +316,15 @@
           </defs>
 
           <g class="rainbow-shift">
-            <!-- antenna stem -->
             <path d="M78 46 C78 34, 82 26, 86 18" fill="none" stroke="url(#rainbow)" stroke-width="5" stroke-linecap="round"/>
             <circle class="antenna-orb" cx="88" cy="16" r="8"/>
             <circle cx="85" cy="13" r="2.4" fill="#fff" opacity="0.75"/>
-
-            <!-- body -->
             <ellipse class="body-fill" cx="80" cy="98" rx="52" ry="42"/>
             <ellipse cx="80" cy="98" rx="52" ry="42" fill="url(#shine)"/>
-
-            <!-- ground shadow (subtle squash cue) -->
             <ellipse cx="80" cy="142" rx="34" ry="6" fill="#000" opacity="0.18"/>
           </g>
 
-          <!-- face: not hue-shifted so eyes stay readable -->
-          <g id="face-idle">
+          <g id="face-idle" hidden>
             <g class="blink" style="transform-origin: 64px 90px">
               <ellipse cx="64" cy="90" rx="7" ry="11" fill="#2a1834"/>
               <circle cx="66" cy="86" r="2.2" fill="#fff"/>
@@ -280,7 +336,7 @@
             <path d="M74 108 Q80 114 86 108" fill="none" stroke="#2a1834" stroke-width="2.4" stroke-linecap="round"/>
           </g>
 
-          <g id="face-nap" hidden>
+          <g id="face-nap">
             <path d="M56 90 Q64 96 72 90" fill="none" stroke="#2a1834" stroke-width="3" stroke-linecap="round"/>
             <path d="M88 90 Q96 96 104 90" fill="none" stroke="#2a1834" stroke-width="3" stroke-linecap="round"/>
             <ellipse cx="80" cy="108" rx="5" ry="3.2" fill="#2a1834" opacity="0.35"/>
@@ -297,53 +353,52 @@
           </g>
         </svg>
       </div>
+      <div class="stage-label" id="stage-label">waiting for Google Calendar</div>
     </div>
 
-    <div class="states" role="group" aria-label="Mood">
-      <button type="button" data-mood="nap">Nap</button>
-      <button type="button" data-mood="idle" aria-pressed="true">Idle at work</button>
-      <button type="button" data-mood="antsy">5 min to meeting</button>
+    <div class="row" role="group" aria-label="Mood preview">
+      <button type="button" data-mood="nap">Preview nap</button>
+      <button type="button" data-mood="idle">Preview idle</button>
+      <button type="button" data-mood="antsy">Preview antsy</button>
+      <button type="button" id="live-btn" class="primary">Follow calendar</button>
     </div>
 
-    <dl>
-      <dt>Silhouette</dt>
-      <dd>Classic Poring: wide jelly ellipse, antenna with a round orb, two vertical oval eyes, tiny mouth.</dd>
-      <dt>Color</dt>
-      <dd>Rainbow body that keeps shifting hue — same idea as the RO “Rainbow Poring Hat.” Faster cycle when antsy, slower when napping.</dd>
-      <dt>Size</dt>
-      <dd>~160px on the desktop; small enough for a corner, big enough that the bounce reads from across a monitor.</dd>
-      <dt>Moods</dt>
-      <dd>Nap = squash + closed eyes + Zzz. Idle = slow bounce. Antsy = frantic hop, sweat, speech bubble, click opens the meeting.</dd>
-    </dl>
+    <div class="row">
+      <button type="button" id="signin-btn" class="primary">Sign in with Google</button>
+      <button type="button" id="signout-btn" hidden>Sign out</button>
+      <button type="button" id="refresh-btn" hidden>Refresh events</button>
+      <button type="button" id="mute-btn">Mute</button>
+    </div>
+
+    <div class="status" id="status">
+      Sign in with Google to watch your calendar. The Poring only asks for
+      read-only access to events.
+    </div>
+
+    <details class="setup" id="setup" open>
+      <summary>Connect Google Calendar (one-time)</summary>
+      <ol>
+        <li>Serve this folder over HTTP — Google Sign-In will not run from a <code>file://</code> page. From this folder: <code>python3 -m http.server 8787</code>, then open <a id="local-link" href="http://localhost:8787">http://localhost:8787</a>.</li>
+        <li>In <a href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com" target="_blank" rel="noopener">Google Cloud Console</a>, create a project and enable the <strong>Google Calendar API</strong>.</li>
+        <li>Configure the OAuth consent screen (External is fine). Add your own Google account as a <strong>test user</strong>.</li>
+        <li>Create an OAuth client ID, type <strong>Web application</strong>. Under Authorized JavaScript origins add <code class="origin" id="origin-chip">http://localhost:8787</code> and <code>http://127.0.0.1:8787</code>.</li>
+        <li>Paste the client ID below and sign in. It stays in this browser; it is not committed.</li>
+      </ol>
+      <label class="field">
+        OAuth client ID
+        <input type="text" id="client-id" placeholder="123456789-abc.apps.googleusercontent.com" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="field">
+        Freak-out window (minutes before start)
+        <input type="number" id="lead-minutes" min="1" max="60" value="5">
+      </label>
+      <div class="row">
+        <button type="button" id="save-settings">Save settings</button>
+      </div>
+    </details>
   </main>
 
-  <script>
-    const pet = document.getElementById("pet");
-    const faces = {
-      nap: document.getElementById("face-nap"),
-      idle: document.getElementById("face-idle"),
-      antsy: document.getElementById("face-antsy"),
-    };
-    const lines = {
-      idle: "",
-      nap: "",
-      antsy: "meetiiing!!",
-    };
-
-    function setMood(mood) {
-      pet.className = "pet-wrap " + mood;
-      document.getElementById("speech").textContent = lines[mood];
-      for (const [name, node] of Object.entries(faces)) {
-        node.hidden = name !== mood;
-      }
-      document.querySelectorAll(".states button").forEach((btn) => {
-        btn.setAttribute("aria-pressed", String(btn.dataset.mood === mood));
-      });
-    }
-
-    document.querySelectorAll(".states button").forEach((btn) => {
-      btn.addEventListener("click", () => setMood(btn.dataset.mood));
-    });
-  </script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="app.js"></script>
 </body>
 </html>
