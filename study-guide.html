@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cursor basics learning guide</title>
+  <style>
+    :root {
+      --bg: #17191d;
+      --surface: #22252b;
+      --text: #eef0f3;
+      --muted: #b7bcc6;
+      --line: #3a3f48;
+      --accent: #8ec8e3;
+      --callout: #2a3038;
+      --callout-border: #4a5560;
+      --done: #7dcc88;
+      --skip: #ef6f6f;
+      --toolbar: #1d2026;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 15.5px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2.75rem;
+    }
+
+    h1 {
+      margin: 0 0 0.4rem;
+      font-size: 1.5rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+    }
+
+    .lede, .how-to {
+      margin: 0 0 0.65rem;
+      color: var(--muted);
+    }
+
+    .callout {
+      background: var(--callout);
+      border: 1px solid var(--callout-border);
+      border-radius: 6px;
+      padding: 0.75rem 0.9rem;
+      margin: 0.75rem 0 1rem;
+    }
+
+    .callout strong { display: block; margin-bottom: 0.25rem; }
+    .callout p { margin: 0; color: var(--text); }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: var(--toolbar);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.55rem 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .progress { font-variant-numeric: tabular-nums; font-weight: 650; }
+    .progress span { color: var(--muted); font-weight: 500; }
+    .toolbar-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+    button, .marker {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 5px;
+      padding: 0.35rem 0.65rem;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover { border-color: #6b7280; }
+    button:focus-visible, a:focus-visible, .marker:focus-visible, summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    #share-status {
+      min-height: 1.2em;
+      margin: 0 0 0.85rem;
+      color: var(--done);
+      font-size: 0.9rem;
+    }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.9rem;
+      margin: 0 0 1rem;
+      font-size: 0.95rem;
+    }
+
+    a { color: var(--accent); }
+
+    section {
+      margin-bottom: 1.1rem;
+    }
+
+    h2 {
+      margin: 0 0 0.55rem;
+      font-size: 1.08rem;
+      font-weight: 650;
+    }
+
+    .topic {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin-bottom: 0.55rem;
+    }
+
+    .topic-row {
+      display: grid;
+      grid-template-columns: 1.35rem 1fr;
+      gap: 0.65rem;
+      align-items: start;
+      padding: 0.55rem 0.75rem 0.55rem 0.65rem;
+    }
+
+    .marker {
+      width: 1.2rem;
+      height: 1.2rem;
+      padding: 0;
+      margin-top: 0.28rem;
+      border-radius: 3px;
+      background: transparent;
+      position: relative;
+    }
+
+    .marker[data-state="done"] {
+      background: #1f3d27;
+      border-color: var(--done);
+    }
+
+    .marker[data-state="done"]::after {
+      content: "";
+      position: absolute;
+      left: 0.28rem;
+      top: 0.08rem;
+      width: 0.32rem;
+      height: 0.58rem;
+      border: solid var(--done);
+      border-width: 0 2px 2px 0;
+      transform: rotate(40deg);
+    }
+
+    .marker[data-state="skip"] {
+      background: #3d1d1d;
+      border-color: var(--skip);
+    }
+
+    .marker[data-state="skip"]::after {
+      content: "×";
+      color: var(--skip);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.05rem;
+      display: block;
+      text-align: center;
+    }
+
+    details { min-width: 0; }
+    summary {
+      cursor: pointer;
+      font-weight: 650;
+      list-style: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::before {
+      content: "▸";
+      display: inline-block;
+      width: 1rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    details[open] summary::before { content: "▾"; }
+
+    .lesson {
+      margin: 0.55rem 0 0.15rem;
+      padding: 0.15rem 0 0.35rem;
+      color: var(--text);
+      border-top: 1px solid var(--line);
+    }
+
+    .lesson h3 {
+      margin: 0.85rem 0 0.35rem;
+      font-size: 0.98rem;
+    }
+
+    .lesson p, .lesson li { color: var(--text); }
+    .lesson p { margin: 0.45rem 0; }
+    .lesson ul, .lesson ol { margin: 0.35rem 0 0.55rem; padding-left: 1.2rem; }
+    .lesson li { margin: 0.25rem 0; }
+
+    .try, .example {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.65rem 0.75rem;
+      margin: 0.7rem 0;
+    }
+
+    .try strong, .example strong, .video-block strong {
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    pre, code, kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.86em;
+    }
+
+    kbd {
+      border: 1px solid var(--line);
+      background: var(--bg);
+      border-radius: 3px;
+      padding: 0 0.28rem;
+    }
+
+    pre {
+      margin: 0.4rem 0 0;
+      white-space: pre-wrap;
+      color: #d7dde6;
+    }
+
+    .video-block { margin: 0.85rem 0 0.35rem; }
+    .video {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #101217;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 0.45rem;
+    }
+    .video iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    footer.sources { margin-top: 0.6rem; }
+    footer.sources ul { margin: 0; padding-left: 1.15rem; }
+    footer.sources li { margin: 0.28rem 0; }
+    .meta { margin-top: 0.85rem; color: var(--muted); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="page">
+      <h1>Cursor basics learning guide</h1>
+      <p class="lede">Learn current Cursor surfaces in place: desktop Agent, Cloud Agents, and MCP. Written against official docs and Cursor’s own videos as of August 2026.</p>
+      <p class="how-to">Open a topic to learn it here. Marker clicks cycle <strong>blank → green check → red X → blank</strong>. Green means learned. Red X means skipped or not needed. The shareable copy for teammates lives in Notion. This local file keeps the interactive markers.</p>
+      <div class="callout">
+        <strong>Share links</strong>
+        <p><strong>Learning guide (Notion):</strong> publish/share <code>study-guide.notion.md</code> from Notion — not githack. After the Notion page exists, paste its URL into <code>NOTION_URL</code> below or the README.<br><strong>This agent chat:</strong> <a href="https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e">https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e</a>. Viewers need the same Cursor team, their own GitHub connected at <a href="https://cursor.com/dashboard/integrations">Integrations</a>, and access to this repo. See <a href="https://cursor.com/docs/cloud-agent.md#share-agents-with-your-team">Share agents with your team</a>.</p>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="progress" aria-live="polite">
+        <span id="done-count">0</span> / <span id="total-count">0</span>
+        <span> learned</span>
+        <span id="skip-label"></span>
+      </div>
+      <div class="toolbar-actions">
+        <button type="button" id="share-link">Copy share info</button>
+        <button type="button" id="reset-progress">Reset progress</button>
+      </div>
+    </div>
+    <p id="share-status" role="status" aria-live="polite"></p>
+
+    <nav class="toc" aria-label="Sections">
+      <a href="#basics">1. Cursor basics</a>
+      <a href="#cloud">2. Cloud Agents</a>
+      <a href="#mcp">3. MCP</a>
+      <a href="#sources">Official docs</a>
+    </nav>
+
+    <main>
+      <section id="basics">
+        <h2>1. Cursor basics</h2>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="what-cursor-is" data-state="" aria-label="Progress: What Cursor is"></button>
+            <details>
+              <summary>What Cursor is</summary>
+              <div class="lesson">
+                <p>Cursor is a desktop AI code editor whose main product surface is <strong>Agent</strong>. You also run the same agent loop as Cloud Agents on the web and mobile, so work can continue without your laptop staying open.</p>
+                <p>Think of three layers:</p>
+                <ul>
+                  <li><strong>Editor</strong> — open a folder, edit files, use Tab and inline edit.</li>
+                  <li><strong>Agent</strong> — a goal-driven loop with tools: search, edit, terminal, browser, and more.</li>
+                  <li><strong>Cloud Agents</strong> — the same loop on an isolated VM, started from cursor.com/agents, desktop, Slack, GitHub, Linear, or mobile.</li>
+                </ul>
+                <p>Composer 2.5 is a <em>model</em> you pick in the model picker. Agent is the product surface. Do not confuse Composer 2.5 with the old Composer UI.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Install or open Cursor, then open any repo folder. You should see a normal editor plus an Agent input. That Agent panel is the surface you will use for almost everything below.</p>
+                </div>
+                <div class="video-block">
+                  <strong>Official video: Introducing Cursor 3</strong>
+                  <p>Cursor’s launch video for the agent-first workspace, local/cloud handoff, and running many agents.</p>
+                  <div class="video" data-youtube="UxbULt_hCdA" data-title="Introducing Cursor 3"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="open-agent" data-state="" aria-label="Progress: Open a folder and start Agent"></button>
+            <details>
+              <summary>Open a folder and start Agent</summary>
+              <div class="lesson">
+                <p>Agent, project rules, skills, and project MCP config are scoped to the folder you opened. Open the repo first, then start Agent.</p>
+                <ol>
+                  <li>File → Open Folder (or open the repo from the welcome screen).</li>
+                  <li>Press <kbd>Cmd</kbd>+<kbd>I</kbd> on Mac or <kbd>Ctrl</kbd>+<kbd>I</kbd> on Windows/Linux.</li>
+                  <li>Type a specific task and press Return.</li>
+                </ol>
+                <div class="example">
+                  <strong>Better first prompt</strong>
+                  <pre>Add a settings page that matches src/pages/Profile.tsx.
+Include display name, email notification toggle, and theme dropdown.
+Reuse existing form components. Do not introduce a new UI library.</pre>
+                </div>
+                <p>Watch edits in the diff view. Use Stop to interrupt. Hover a previous message and restore a checkpoint if the agent went the wrong direction. Checkpoints are local snapshots, not a replacement for Git.</p>
+                <div class="video-block">
+                  <strong>Official video: Agent View &amp; CLI setup</strong>
+                  <div class="video" data-youtube="DpMOt9wiEzM" data-title="Cursor Agent View and CLI Setup"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="agent-mode" data-state="" aria-label="Progress: How Agent mode works"></button>
+            <details>
+              <summary>How Agent mode works</summary>
+              <div class="lesson">
+                <p>Agent mode searches the codebase, edits files, runs terminal commands, and iterates until the task is done or you stop it. Under the hood it is an <strong>agent harness</strong>:</p>
+                <ol>
+                  <li><strong>Instructions</strong> — system prompt plus your rules.</li>
+                  <li><strong>Tools</strong> — read/search files, edit, shell, browser, web, image generation, clarifying questions, and more. There is no hard cap on tool calls.</li>
+                  <li><strong>Model</strong> — the model you pick (or Auto / Cursor Router).</li>
+                </ol>
+                <p>An agent is “tools in a loop.” You give a destination; it chooses the next tool based on the last result. Your job becomes direction and review, not typing every step.</p>
+                <p>Queue follow-ups with Enter while it works. Send immediately with <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>Enter</kbd>. Start a new chat when the task changes so context stays clean.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Ask Agent to add a failing test for one existing function, run the test suite, then make only that test pass. Watch which files it opens and which commands it runs.</p>
+                </div>
+                <div class="video-block">
+                  <strong>Official video: How Cursor uses Cursor</strong>
+                  <div class="video" data-youtube="kcBt3cuZAhI" data-title="How Cursor uses Cursor"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="agent-modes" data-state="" aria-label="Progress: Agent, Ask, Plan, and Debug"></button>
+            <details>
+              <summary>Agent, Ask, Plan, and Debug</summary>
+              <div class="lesson">
+                <p>Cycle modes with <kbd>Shift</kbd>+<kbd>Tab</kbd> or the mode picker. Each mode starts a fresh context window.</p>
+                <ul>
+                  <li><strong>Agent</strong> — default. Edits files and runs commands. Use for building, refactors, fixes, and verification.</li>
+                  <li><strong>Ask</strong> — read-only. Use when you want explanation without changes.</li>
+                  <li><strong>Plan</strong> — researches the repo, asks clarifying questions, writes a reviewable plan. Click <strong>Build</strong> only after you approve it. Plans save locally; use Save to workspace to keep them in the repo.</li>
+                  <li><strong>Debug</strong> — for tricky bugs that need runtime evidence. It can edit while gathering that evidence.</li>
+                </ul>
+                <p>Project, user, and team rules apply in all four modes. They do not apply to Tab or inline edit.</p>
+                <div class="example">
+                  <strong>When to use Plan</strong>
+                  <p>Multi-file features, several valid approaches, unclear requirements, or architecture choices. For a one-function rename, stay in Agent.</p>
+                </div>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Switch to Plan and ask for a notification-preferences feature. Answer the clarifying questions, edit one milestone in the plan, then click Build. If the result is wrong, revert to the plan and tighten it instead of piling on chat fixes.</p>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="tab-autocomplete" data-state="" aria-label="Progress: Tab autocomplete"></button>
+            <details>
+              <summary>Tab autocomplete</summary>
+              <div class="lesson">
+                <p>Tab is next-edit prediction as you type, not the Agent panel. Suggestions appear as ghost text from recent edits, nearby code, and linter errors.</p>
+                <ul>
+                  <li>Accept all: <kbd>Tab</kbd></li>
+                  <li>Reject: <kbd>Esc</kbd> or keep typing</li>
+                  <li>Accept word by word: <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>→</kbd></li>
+                  <li>After an accept, <kbd>Tab</kbd> again can jump to the next edit location, including another file.</li>
+                </ul>
+                <p>Turn Tab off from the status bar indicator (snooze, disable globally, or disable by file type) or Cursor Settings → Tab.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Rename a function in one file and keep typing call sites. Notice when Tab jumps to the next usage instead of only finishing the current line.</p>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="inline-edit" data-state="" aria-label="Progress: Inline edit with Cmd or Ctrl+K"></button>
+            <details>
+              <summary>Inline edit with Cmd/Ctrl+K</summary>
+              <div class="lesson">
+                <p>Inline edit is a surgical change in the current selection. It does not open Agent and does not use user rules.</p>
+                <ol>
+                  <li>Select the code.</li>
+                  <li>Press <kbd>Cmd</kbd>+<kbd>K</kbd> / <kbd>Ctrl</kbd>+<kbd>K</kbd>.</li>
+                  <li>Describe the change, then Return.</li>
+                  <li>Follow up in the same inline session if needed.</li>
+                </ol>
+                <p>Question mode: <kbd>Opt</kbd>/<kbd>Alt</kbd>+<kbd>Return</kbd> inside inline edit. To escalate to Agent with the selection as context, use <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>L</kbd>.</p>
+                <div class="example">
+                  <strong>Good inline-edit prompts</strong>
+                  <pre>Convert this function to async/await.
+Add null checks without changing the return type.
+Rewrite this as a switch on status.</pre>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="at-mentions" data-state="" aria-label="Progress: @ mentions and context"></button>
+            <details>
+              <summary>@ mentions and context</summary>
+              <div class="lesson">
+                <p>Type <code>@</code> in the Agent input to attach exact context. Official mention types include:</p>
+                <ul>
+                  <li>Files and folders, e.g. <code>@auth.ts</code> or <code>@src/components/</code></li>
+                  <li>Terminal output via <code>@Terminals</code></li>
+                  <li>Git: uncommitted diff or diff vs main</li>
+                  <li>Browser context via <code>@Browser</code></li>
+                  <li>Past chats</li>
+                </ul>
+                <p>If you know the file, mention it. If you do not, skip <code>@</code> — Agent can search. The context ring next to the input shows how full the window is (system prompt, tools, rules, skills, MCP, conversation, summaries).</p>
+                <p>You can also paste images or screenshots. Voice input is available from the mic icon on the input.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Start a prompt with <code>@</code> and attach one folder plus the git working-tree diff. Ask Agent to explain only what changed and whether tests cover it. Do not ask it to edit yet (or switch to Ask).</p>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="rules" data-state="" aria-label="Progress: Rules and AGENTS.md"></button>
+            <details>
+              <summary>Rules and AGENTS.md</summary>
+              <div class="lesson">
+                <p>Rules are persistent instructions injected into Agent context. Precedence is <strong>Team → Project → User</strong>.</p>
+                <ul>
+                  <li><strong>Project rules</strong> — <code>.cursor/rules/*.mdc</code>, version-controlled. Apply always, by glob, intelligently from a description, or only when <code>@</code>-mentioned. Plain <code>.md</code> files in that folder are ignored.</li>
+                  <li><strong>User rules</strong> — Customize → Rules. Global style preferences. Agent chat only.</li>
+                  <li><strong>Team rules</strong> — dashboard, Teams/Enterprise. Can be enforced so members cannot disable them.</li>
+                  <li><strong>AGENTS.md</strong> — plain markdown in the repo root or nested folders. Nested files combine; closer folders win. Use this when you do not need <code>.mdc</code> frontmatter.</li>
+                </ul>
+                <div class="example">
+                  <strong>Example project rule</strong>
+                  <pre>---
+description: API validation conventions
+alwaysApply: false
+---
+- Validate inputs with zod at the route boundary.
+- Never throw raw strings; return { code, message }.
+- Follow src/services/paymentService.ts as the template.</pre>
+                </div>
+                <p>Create rules with <code>/create-rule</code> in Agent or from Customize → Rules. Keep rules short and concrete. Do not dump an entire style guide; use a linter for that.</p>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="skills" data-state="" aria-label="Progress: Skills"></button>
+            <details>
+              <summary>Skills (SKILL.md)</summary>
+              <div class="lesson">
+                <p>Skills are portable workflow packages. Unlike always-on rules, a skill is included when Agent decides it is relevant, or when you type <code>/</code> and pick it.</p>
+                <p>Discovered from <code>.cursor/skills/</code>, <code>.agents/skills/</code>, matching user-level folders, and compatibility paths such as <code>.claude/skills/</code>. Each skill is a folder with <code>SKILL.md</code>:</p>
+                <div class="example">
+                  <pre>---
+name: deploy-app
+description: Deploy to staging or production. Use when the user mentions deploy or release.
+---
+# Deploy App
+Run scripts/deploy.sh &lt;staging|production&gt;
+Validate first with python scripts/validate.py</pre>
+                </div>
+                <p>Optional <code>scripts/</code>, <code>references/</code>, and <code>assets/</code> folders load on demand. Built-in skills include <code>/create-rule</code>, <code>/create-skill</code>, <code>/review</code>, and others. View them under Customize → Skills.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Type <code>/</code> in Agent and open <code>/create-skill</code>. Create a tiny skill that runs your repo’s lint command. Then invoke it by name on a dirty file.</p>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="models" data-state="" aria-label="Progress: Models picker and Composer 2.5"></button>
+            <details>
+              <summary>Models picker and Composer 2.5</summary>
+              <div class="lesson">
+                <p>Pick a model from the dropdown at the Agent input, or cycle with <kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>/</kbd>. Mode (Agent/Ask/Plan/Debug) and model are independent.</p>
+                <p><strong>Composer 2.5</strong> is Cursor’s own agentic coding model, not the retired Composer UI. It sits in the Cursor Models usage pool with Cursor Grok 4.5. Auto / Cursor Router can choose a model for you; Teams often default to Auto.</p>
+                <ul>
+                  <li>Faster / cheaper models — routine edits and tight loops.</li>
+                  <li>Stronger frontier models — hard reasoning, messy multi-file design.</li>
+                  <li>You can switch mid-conversation; the new model applies going forward.</li>
+                </ul>
+                <p>Set a default in Cursor Settings → Models. Cloud Agents use a curated subset and let you choose context window size on supported models.</p>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="privacy" data-state="" aria-label="Progress: Privacy Mode for teams"></button>
+            <details>
+              <summary>Privacy Mode for teams</summary>
+              <div class="lesson">
+                <p>With Privacy Mode on, Cursor does not train on your code. Teams typically have Privacy Mode on by default, and admins can enforce it.</p>
+                <p><strong>Legacy “No Storage” Privacy Mode</strong> blocks cloud storage. That disables:</p>
+                <ul>
+                  <li>Cloud Agents, which must store code and environment data while they run</li>
+                  <li>Shared Transcripts, which need stored conversation history</li>
+                </ul>
+                <p>Use standard Privacy Mode, not No Storage, if you need Cloud Agents. Cloud Agents still keep run transcripts and environment snapshots long enough to review and resume. Secrets belong in the Cloud Agents dashboard, not in git.</p>
+              </div>
+            </details>
+          </div>
+        </article>
+      </section>
+
+      <section id="cloud">
+        <h2>2. Cloud Agents</h2>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="cloud-overview" data-state="" aria-label="Progress: Isolated cloud VMs"></button>
+            <details>
+              <summary>Isolated cloud VMs, not your laptop</summary>
+              <div class="lesson">
+                <p>Cloud Agents were formerly called Background Agents. Each run gets an isolated VM with a full dev environment: clone, dependencies, secrets, startup commands, and network. Your laptop does not have to stay online.</p>
+                <p>Because the agent has its own computer, it can build, test, drive a browser/desktop, record artifacts, and open a PR. Local Agent competes with you for your machine. Cloud Agents scale out in parallel.</p>
+                <ul>
+                  <li><strong>Local</strong> — edits on your laptop, you watch diffs live, laptop must be available.</li>
+                  <li><strong>Cloud</strong> — VM, branch + optional PR, artifacts, shareable run URL, many agents at once.</li>
+                </ul>
+                <p>Environment setup is what makes cloud agents useful. Without tests and tools, they cannot close the loop. Configure setup via agent-led setup, a snapshot, or <code>.cursor/environment.json</code>.</p>
+                <div class="video-block">
+                  <strong>Official video: Cursor Cloud Agents</strong>
+                  <div class="video" data-youtube="0JsmvKps9po" data-title="Cursor Cloud Agents"></div>
+                </div>
+                <div class="video-block">
+                  <strong>Official video: testing in a live VM</strong>
+                  <div class="video" data-youtube="tZGaZVbxISc" data-title="Cursor Cloud Agents testing code in live virtual machines"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="cloud-start-review" data-state="" aria-label="Progress: Start and review a Cloud Agent"></button>
+            <details>
+              <summary>Start and review a Cloud Agent</summary>
+              <div class="lesson">
+                <p>A team admin must connect source control before anyone can start cloud agents on a repo. Then start from anywhere you work:</p>
+                <ul>
+                  <li><a href="https://cursor.com/agents">cursor.com/agents</a> on any device</li>
+                  <li>Desktop Agent input → dropdown → <strong>Cloud</strong></li>
+                  <li>Cursor iOS app; Android uses the agents site as a PWA</li>
+                  <li>Slack or Linear: <code>@cursor</code></li>
+                  <li>GitHub PR/issue or Bitbucket PR comment: <code>@cursor</code></li>
+                  <li>API</li>
+                </ul>
+                <p>On the run page, review the conversation, diffs, artifacts (screenshots, videos, logs), optional remote desktop, and the PR if the agent pushed. Plan mode can hand a local plan to a cloud agent for implementation.</p>
+                <div class="example">
+                  <strong>Good cloud handoff</strong>
+                  <p>Plan locally until the approach is clear, then send that plan to Cloud so you can switch tasks. Come back to artifacts + PR instead of sitting on the laptop diff.</p>
+                </div>
+                <div class="video-block">
+                  <strong>Official video: a cloud agent building a small game</strong>
+                  <div class="video" data-youtube="G044GBwgcKA" data-title="I made a game with Cursor cloud agents"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="cloud-share" data-state="" aria-label="Progress: Share Cloud Agent runs vs Shared Transcripts"></button>
+            <details>
+              <summary>Share runs vs Shared Transcripts</summary>
+              <div class="lesson">
+                <p>Send the Cloud Agent run URL. A viewer needs all three:</p>
+                <ol>
+                  <li>Same Cursor team</li>
+                  <li>Their own SCM connected at <a href="https://cursor.com/dashboard/integrations">Integrations</a></li>
+                  <li>Access to the repository</li>
+                </ol>
+                <p>Team membership alone is not enough. Default view is read-only. Team follow-ups must be enabled by an admin before teammates can continue the run.</p>
+                <p><strong>Shared Transcripts</strong> are different: they share a local IDE chat at <code>cursor.com/s/…</code>, Teams/Enterprise only, and they are unavailable under No Storage Privacy Mode. Do not use a transcript link when you mean a cloud run.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Open this Cloud Agent run on <a href="https://cursor.com/agents">cursor.com/agents</a>, copy its URL, and confirm a teammate with repo access can open the conversation and diffs.</p>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+      </section>
+
+      <section id="mcp">
+        <h2>3. MCP (Model Context Protocol)</h2>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="mcp-basics" data-state="" aria-label="Progress: What MCP is and how to add it locally"></button>
+            <details>
+              <summary>What MCP is and how to add it locally</summary>
+              <div class="lesson">
+                <p>MCP connects Agent to external tools and data — Linear, Notion, databases, APIs — so the agent can act instead of relying on pasted context.</p>
+                <p>Add servers locally from <strong>Customize → MCPs</strong> (including marketplace one-click install), or with JSON:</p>
+                <ul>
+                  <li><code>.cursor/mcp.json</code> — project, shared via git</li>
+                  <li><code>~/.cursor/mcp.json</code> — user, every local project</li>
+                </ul>
+                <div class="example">
+                  <strong>Remote HTTP example</strong>
+                  <pre>{
+  "mcpServers": {
+    "linear": {
+      "url": "https://mcp.linear.app/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:LINEAR_API_KEY}"
+      }
+    }
+  }
+}</pre>
+                </div>
+                <p>Agent uses listed tools automatically when relevant, including in Plan mode. Approval follows the same run-mode rules as terminal commands. Toggle servers in Customize without deleting them. Debug via Output → MCP Logs.</p>
+                <div class="try">
+                  <strong>Learn by doing</strong>
+                  <p>Install one trusted marketplace MCP you already use (for example Linear). Ask Agent, by name, to list your recent issues. Confirm the tool call arguments before approving.</p>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+
+        <article class="topic">
+          <div class="topic-row">
+            <button type="button" class="marker" data-id="mcp-team-cloud" data-state="" aria-label="Progress: Team MCP, Cloud MCP, and security"></button>
+            <details>
+              <summary>Team MCP, Cloud MCP, and security</summary>
+              <div class="lesson">
+                <p>Three distribution paths stay separate:</p>
+                <ul>
+                  <li><strong>Dashboard → Integrations &amp; MCP</strong> feeds Cloud Agents. Linking to the team marketplace does not auto-install for every IDE user.</li>
+                  <li><strong>Git <code>mcp.json</code></strong> applies to people who clone the repo locally.</li>
+                  <li><strong>Marketplace / Customize install</strong> is a personal or team-plugin action.</li>
+                </ul>
+                <p>On Cloud Agents, <strong>HTTP is preferred</strong> and stdio also works. <strong>SSE and <code>mcp-remote</code> are not supported</strong>. OAuth is per-user, including for team-shared servers. Manage cloud MCP from the MCP dropdown on cursor.com/agents.</p>
+                <p>Security:</p>
+                <ul>
+                  <li>Install only trusted publishers; review what the server can access.</li>
+                  <li>Least privilege API keys.</li>
+                  <li>Never hardcode secrets in git-tracked <code>mcp.json</code>. Use <code>${env:NAME}</code>, dashboard secrets, or OAuth.</li>
+                </ul>
+                <div class="video-block">
+                  <strong>Official video: Cursor Agent SDK</strong>
+                  <p>Useful if you later wrap MCP-style tools into your own agents. Skip it until local MCP feels comfortable.</p>
+                  <div class="video" data-youtube="doUzFbTdYQ8" data-title="Cursor Agent SDK"></div>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="sources" id="sources">
+      <h2>Official docs</h2>
+      <ul>
+        <li><a href="https://cursor.com/docs/agent/overview">Agent overview</a></li>
+        <li><a href="https://cursor.com/help/ai-features/agent">Agent mode help</a></li>
+        <li><a href="https://cursor.com/learn/working-with-agents">Learn: working with agents</a></li>
+        <li><a href="https://cursor.com/docs/cloud-agent">Cloud Agents</a></li>
+        <li><a href="https://cursor.com/docs/mcp">Model Context Protocol (MCP)</a></li>
+        <li><a href="https://cursor.com/docs/rules">Rules</a></li>
+        <li><a href="https://cursor.com/docs/skills">Agent Skills</a></li>
+        <li><a href="https://cursor.com/help/ai-features/shared-transcripts">Shared transcripts</a></li>
+      </ul>
+      <p class="meta">Lessons stay on this page. Official videos load from YouTube only after you open a topic. Progress key: <code>cursor-basics-study-guide-v2</code>. Marker cycle: check, red X, blank.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var STORAGE_KEY = "cursor-basics-study-guide-v2";
+      var NOTION_URL = "";
+      var AGENT_CHAT_URL = "https://cursor.com/agents/bc-74e6217f-62e8-414b-b188-b8d2cf27406e";
+      var markers = Array.prototype.slice.call(document.querySelectorAll(".marker[data-id]"));
+      var doneEl = document.getElementById("done-count");
+      var totalEl = document.getElementById("total-count");
+      var skipLabel = document.getElementById("skip-label");
+      var resetBtn = document.getElementById("reset-progress");
+      var shareBtn = document.getElementById("share-link");
+      var shareStatus = document.getElementById("share-status");
+      var STATES = ["", "done", "skip"];
+
+      totalEl.textContent = String(markers.length);
+
+      function stateValue(marker) {
+        var value = marker.getAttribute("data-state") || "";
+        if (value === "done") return 1;
+        if (value === "skip") return 2;
+        return 0;
+      }
+
+      function setState(marker, value) {
+        var next = STATES[value] || "";
+        marker.setAttribute("data-state", next);
+        var label = marker.getAttribute("aria-label") || "Progress";
+        var status = next === "done" ? "learned" : next === "skip" ? "skipped" : "not started";
+        marker.setAttribute("aria-label", label.replace(/: .*$/, "") + ": " + status);
+      }
+
+      function currentCodes() {
+        return markers.map(stateValue);
+      }
+
+      function encodeProgress(codes) {
+        var bytes = [];
+        codes.forEach(function (code, index) {
+          var bitIndex = index * 2;
+          var byteIndex = (bitIndex / 8) | 0;
+          var shift = bitIndex % 8;
+          if (bytes[byteIndex] == null) bytes[byteIndex] = 0;
+          bytes[byteIndex] |= (code & 3) << shift;
+        });
+        return "2-" + bytes.map(function (value) {
+          return (value + 0x100).toString(16).slice(1);
+        }).join("");
+      }
+
+      function decodeV2(hex) {
+        if (!hex || hex.length % 2 || /[^0-9a-f]/i.test(hex)) return null;
+        return markers.map(function (_, index) {
+          var bitIndex = index * 2;
+          var byte = parseInt(hex.substr(((bitIndex / 8) | 0) * 2, 2) || "00", 16);
+          return (byte >> (bitIndex % 8)) & 3;
+        });
+      }
+
+      function decodeV1(hex) {
+        if (!hex || hex.length % 2 || /[^0-9a-f]/i.test(hex)) return null;
+        return markers.map(function (_, index) {
+          var byte = parseInt(hex.substr(((index / 8) | 0) * 2, 2) || "00", 16);
+          return byte & (1 << (index % 8)) ? 1 : 0;
+        });
+      }
+
+      function decodeProgress(token) {
+        if (!token) return null;
+        if (token.indexOf("2-") === 0) return decodeV2(token.slice(2));
+        if (token.indexOf("1-") === 0) return decodeV1(token.slice(2));
+        return null;
+      }
+
+      function applyCodes(codes) {
+        markers.forEach(function (marker, index) {
+          setState(marker, codes && codes[index] ? codes[index] : 0);
+        });
+        updateCount();
+      }
+
+      function readLocal() {
+        try {
+          var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+          return markers.map(function (marker) {
+            var value = saved[marker.getAttribute("data-id")];
+            if (value === "done" || value === true || value === 1) return 1;
+            if (value === "skip" || value === 2) return 2;
+            return 0;
+          });
+        } catch (err) {
+          return markers.map(function () { return 0; });
+        }
+      }
+
+      function writeLocal(codes) {
+        var saved = {};
+        markers.forEach(function (marker, index) {
+          saved[marker.getAttribute("data-id")] = STATES[codes[index]] || "";
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      }
+
+      function buildShareText(codes) {
+        var lines = [];
+        if (NOTION_URL) {
+          lines.push("Learning guide (Notion): " + NOTION_URL);
+        } else {
+          lines.push("Learning guide (Notion): import study-guide.notion.md into Notion and share that page. Do not use githack.");
+        }
+        lines.push("Agent chat: " + AGENT_CHAT_URL);
+        var any = codes.some(function (code) { return code > 0; });
+        if (any) lines.push("Local HTML progress token: " + encodeProgress(codes));
+        return lines.join("\n");
+      }
+
+      function persistUrl(codes) {
+        if (!/^https?:$/.test(location.protocol) || !history.replaceState) return;
+        try {
+          var next = new URL(location.href);
+          var any = codes.some(function (code) { return code > 0; });
+          if (any) next.searchParams.set("p", encodeProgress(codes));
+          else next.searchParams.delete("p");
+          history.replaceState(null, "", next.pathname + next.search + next.hash);
+        } catch (err) {}
+      }
+
+      function updateCount() {
+        var done = 0;
+        var skipped = 0;
+        markers.forEach(function (marker) {
+          var value = stateValue(marker);
+          if (value === 1) done += 1;
+          if (value === 2) skipped += 1;
+        });
+        doneEl.textContent = String(done);
+        skipLabel.textContent = skipped ? " · " + skipped + " skipped" : "";
+      }
+
+      function save() {
+        var codes = currentCodes();
+        writeLocal(codes);
+        persistUrl(codes);
+        updateCount();
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function (resolve, reject) {
+          var field = document.createElement("textarea");
+          field.value = text;
+          field.setAttribute("readonly", "");
+          field.style.position = "fixed";
+          field.style.left = "-9999px";
+          document.body.appendChild(field);
+          field.select();
+          try {
+            if (!document.execCommand("copy")) throw new Error("copy failed");
+            resolve();
+          } catch (err) {
+            reject(err);
+          } finally {
+            document.body.removeChild(field);
+          }
+        });
+      }
+
+      function loadVideo(container) {
+        if (!container || container.getAttribute("data-loaded") === "1") return;
+        var id = container.getAttribute("data-youtube");
+        var title = container.getAttribute("data-title") || "Official Cursor video";
+        if (!id) return;
+        container.setAttribute("data-loaded", "1");
+        container.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id +
+          '" title="' + title.replace(/"/g, "&quot;") +
+          '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>';
+      }
+
+      markers.forEach(function (marker) {
+        marker.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          var next = (stateValue(marker) + 1) % 3;
+          setState(marker, next);
+          save();
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll("details"), function (details) {
+        details.addEventListener("toggle", function () {
+          if (!details.open) return;
+          Array.prototype.forEach.call(details.querySelectorAll(".video[data-youtube]"), loadVideo);
+        });
+      });
+
+      shareBtn.addEventListener("click", function () {
+        var text = buildShareText(currentCodes());
+        shareBtn.setAttribute("data-last-share-url", text);
+        copyText(text).then(function () {
+          shareStatus.textContent = "Copied Notion + agent chat share info.";
+          shareBtn.textContent = "Copied";
+          window.setTimeout(function () { shareBtn.textContent = "Copy share info"; }, 1600);
+        }).catch(function () {
+          shareStatus.textContent = "Copy failed. Share info:\n" + text;
+        });
+      });
+
+      resetBtn.addEventListener("click", function () {
+        if (!window.confirm("Clear all learning progress in this browser?")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        applyCodes([]);
+        persistUrl([]);
+        shareStatus.textContent = "";
+      });
+
+      var shared = decodeProgress(new URLSearchParams(location.search).get("p") || "");
+      var codes = shared || readLocal();
+      applyCodes(codes);
+      writeLocal(currentCodes());
+      persistUrl(currentCodes());
+    })();
+  </script>
+</body>
+</html>
